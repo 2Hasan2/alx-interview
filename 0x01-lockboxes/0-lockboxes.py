@@ -14,27 +14,22 @@ def canUnlockAll(boxes):
         bool: True if all boxes can be unlocked, False otherwise.
 
     The function starts with the first box (index 0) which is unlocked by
-    default. It uses Breadth-First Search (BFS) to explore all the boxes
-    that can be unlocked using the keys found in each unlocked box. It
-    tracks the unlocked boxes in a set and uses a queue to manage the
-    boxes to be processed. After processing, it checks if all boxes are
-    unlocked by comparing the count of unlocked boxes to the total number
-    of boxes.
+    default. It uses a set to keep track of seen and unseen boxes. It
+    performs a while loop to explore all boxes that can be unlocked using
+    the keys found in each unlocked box. After processing, it checks if all
+    boxes are unlocked by comparing the count of seen boxes to the total
+    number of boxes.
     """
-    # Initialize a set to track unlocked boxes
-    unlocked = set()
-    # Use a list as a queue for BFS
-    queue = [0]
+    n = len(boxes)
+    seen_boxes = set([0])
+    unseen_boxes = set(boxes[0]).difference(set([0]))
 
-    # Perform BFS
-    while queue:
-        current_box = queue.pop(0)
-        if current_box not in unlocked:
-            unlocked.add(current_box)
-            # Add all boxes that can be unlocked by the current box's keys
-            for key in boxes[current_box]:
-                if key < len(boxes) and key not in unlocked:
-                    queue.append(key)
+    while len(unseen_boxes) > 0:
+        boxIdx = unseen_boxes.pop()
+        if boxIdx < 0 or boxIdx >= n:
+            continue
+        if boxIdx not in seen_boxes:
+            unseen_boxes = unseen_boxes.union(boxes[boxIdx])
+            seen_boxes.add(boxIdx)
 
-    # Check if all boxes are unlocked
-    return len(unlocked) == len(boxes)
+    return n == len(seen_boxes)
