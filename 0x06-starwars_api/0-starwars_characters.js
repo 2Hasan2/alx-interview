@@ -1,12 +1,11 @@
 #!/usr/bin/node
 const request = require("request");
-const url = "https://swapi-api.hbtn.io/api";
+const API_URL = "https://swapi-api.hbtn.io/api";
 
 if (process.argv.length > 2) {
-  request(`${url}/films/${process.argv[2]}`, (error, _, body) => {
-    if (error) {
-      console.error(error);
-      return;
+  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
+    if (err) {
+      console.log(err);
     }
     const charactersURL = JSON.parse(body).characters;
     const charactersName = charactersURL.map(
