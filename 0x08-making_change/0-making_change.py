@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+from collections import deque
+
 """Making Change with optimizations.
 """
 
@@ -10,16 +12,17 @@ def makeChange(coins, total):
     if total <= 0:
         return 0
 
-    coins.sort(reverse=True)
+    queue, visited = deque([(0, 0)]), set([0])
 
-    dp = [float("inf")] * (total + 1)
-    dp[0] = 0
+    while queue:
+        curr_sum, num_coins = queue.popleft()
+        for coin in coins:
+            new_sum = curr_sum + coin
 
-    for coin in coins:
-        for t in range(coin, total + 1):
-            dp[t] = min(dp[t], dp[t - coin] + 1)
+            if new_sum == total:
+                return num_coins + 1
+            if new_sum < total and new_sum not in visited:
+                visited.add(new_sum)
+                queue.append((new_sum, num_coins + 1))
 
-            if dp[total] != float("inf"):
-                break
-
-    return dp[total] if dp[total] != float("inf") else -1
+    return -1
