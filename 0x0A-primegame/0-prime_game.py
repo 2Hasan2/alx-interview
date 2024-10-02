@@ -1,7 +1,17 @@
 #!/usr/bin/python3
-"""Prime game module.
-"""
-from math import sqrt
+"""Prime game module."""
+
+
+def sieve_of_eratosthenes(n):
+    """Generate a list of prime numbers up to n using the Sieve of Eratosthenes."""
+    is_prime = [True] * (n + 1)
+    p = 2
+    while p * p <= n:
+        if is_prime[p]:
+            for i in range(p * p, n + 1, p):
+                is_prime[i] = False
+        p += 1
+    return [p for p in range(2, n + 1) if is_prime[p]]
 
 
 def isWinner(x: int, nums: list[int]) -> str:
@@ -9,37 +19,30 @@ def isWinner(x: int, nums: list[int]) -> str:
 
     Args:
         x (int): The number of rounds.
-        nums (List[int]): A list of integers representing the upper limit for each round.
+        nums (list[int]): A list of integers representing the upper limit for each round.
 
     Returns:
-        str: The name of the winner, either "Ben" or "Maria".
+        str: The name of the player that won the most rounds or None if the winner cannot be determined.
     """
-    rounds = [
-        [i for i in range(1, nums[round] + 1) if is_prime(i)] for round in range(x)
-    ]
-    ben, maria = 0, 0
-    for round in rounds:
-        ben += len(round) == 0 or len(round) % 2 == 0
-        maria += len(round) % 2 == 1
-    return "Ben" if ben > maria else "Maria"
+    if x <= 0 or not nums:
+        return None
 
+    max_n = max(nums)
+    primes = sieve_of_eratosthenes(max_n)
 
-def is_prime(num: int) -> bool:
-    """Check if a number is prime.
+    maria_wins = 0
+    ben_wins = 0
 
-    Args:
-        num (int): The number to check for primality.
+    for n in nums:
+        count_primes = len([p for p in primes if p <= n])
+        if count_primes % 2 == 1:
+            maria_wins += 1
+        else:
+            ben_wins += 1
 
-    Returns:
-        bool: True if num is prime, False otherwise.
-    """
-    if num <= 1:
-        return False
-    if num <= 3:
-        return True
-    if num % 2 == 0 or num % 3 == 0:
-        return False
-    for i in range(5, int(sqrt(num) + 1)):
-        if num % i == 0 or num % (i + 2) == 0:
-            return False
-    return True
+    if maria_wins > ben_wins:
+        return "Maria"
+    elif ben_wins > maria_wins:
+        return "Ben"
+    else:
+        return None
