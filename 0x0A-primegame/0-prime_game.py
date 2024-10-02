@@ -1,45 +1,27 @@
 #!/usr/bin/python3
 """Prime game module.
 """
-from math import sqrt
 
 
-def isWinner(x: int, nums: list[int]) -> str:
-    """Determine the winner of the prime game.
-
-    Args:
-        x (int): The number of rounds.
-        nums (List[int]): A list of integers representing the upper limit for each round.
-
-    Returns:
-        str: The name of the winner, either "Ben" or "Maria".
-    """
-    rounds = [
-        [i for i in range(1, nums[round] + 1) if is_prime(i)] for round in range(x)
-    ]
-    ben, maria = 0, 0
-    for round in rounds:
-        ben += len(round) == 0 or len(round) % 2 == 0
-        maria += len(round) % 2 == 1
-    return "Ben" if ben > maria else "Maria"
-
-
-def is_prime(num: int) -> bool:
-    """Check if a number is prime.
-
-    Args:
-        num (int): The number to check for primality.
-
-    Returns:
-        bool: True if num is prime, False otherwise.
-    """
-    if num <= 1:
-        return False
-    if num <= 3:
-        return True
-    if num % 2 == 0 or num % 3 == 0:
-        return False
-    for i in range(5, int(sqrt(num) + 1)):
-        if num % i == 0 or num % (i + 2) == 0:
-            return False
-    return True
+def isWinner(x, nums):
+    """Determines the winner of a prime game session with `x` rounds."""
+    if x < 1 or not nums:
+        return None
+    marias_wins, bens_wins = 0, 0
+    # generate primes with a limit of the maximum number in nums
+    n = max(nums)
+    primes = [True for _ in range(1, n + 1, 1)]
+    primes[0] = False
+    for i, is_prime in enumerate(primes, 1):
+        if i == 1 or not is_prime:
+            continue
+        for j in range(i + i, n + 1, i):
+            primes[j - 1] = False
+    # filter the number of primes less than n in nums for each round
+    for _, n in zip(range(x), nums):
+        primes_count = len(list(filter(lambda x: x, primes[0:n])))
+        bens_wins += primes_count % 2 == 0
+        marias_wins += primes_count % 2 == 1
+    if marias_wins == bens_wins:
+        return None
+    return "Maria" if marias_wins > bens_wins else "Ben"
